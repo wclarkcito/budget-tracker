@@ -32,6 +32,7 @@ function updateDatabase() {
 
     const getAll = pendingStore.getAll();
 
+
     //write a promise witha  a fetch and then
 
 }
