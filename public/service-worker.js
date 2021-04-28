@@ -1,7 +1,8 @@
 const FILES_TO_CACHE = [
-    "/", "/index.html", "/db.js", "/styles.css"
+    "/", "/index.html", "/db.js", "/styles.css", "/manifest.webmanifest"
 ];
 
+// const CACHE_NAME = "my-site-cache-v1";
 const CACHE_NAME = "static-cache-v2";
 const DATA_CACHE_NAME = "data-cache-v1";
 
@@ -62,8 +63,26 @@ self.addEventListener("fetch", function (evt) {
     // if the request is not for the API, serve static assets using "offline-first" approach.
 
     evt.respondWith(
-        caches.match(evt.request).then(function (response) {
-            return response || fetch(evt.request);
-        })
+        fetch(evt.request).catch(
+            () => {
+                return caches.match(evt.request).then(function (response) {
+                    if (response) {
+                        return (response)
+
+                    }
+                    else if (evt.request.headers.get(
+                        "accept"
+                    ).includes(
+                        "text/html"
+                    )) {
+                        return (caches.match("/"))
+                    }
+
+
+                    // return response || fetch(evt.request);
+                })
+            }
+        )
+
     );
 });

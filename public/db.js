@@ -1,6 +1,15 @@
+const indexedDB =
+    window.indexedDB ||
+    window.mozIndexedDB ||
+    window.webkitIndexedDB ||
+    window.msIndexedDB ||
+    window.shimIndexedDB;
+
+
 let db;
 
 const request = indexedDB.open("budget", 1);
+console.log(request)
 
 request.onupgradeneeded = function (event) {
     const updatedDB = event.target.result;
@@ -27,14 +36,15 @@ function saveRecord(record) {
 }
 
 function updateDatabase() {
+    console.log(db)
     const transaction = db.transaction(["pending"], "readwrite");
     const pendingStore = transaction.objectStore("pending");
     const getAll = pendingStore.getAll();
 
 
-    //write a promise witha  a fetch and then
+
     getAll.onsuccess = function () {
-        // If there are items in the store, we need to bulk add them when we are back online
+
         if (getAll.result.length > 0) {
             fetch('/api/transaction/bulk', {
                 method: 'POST',
@@ -47,21 +57,21 @@ function updateDatabase() {
                 .then((response) => response.json())
                 .then(() => {
 
-                    if (res.length !== 0) {
-                        // Open another transaction to BudgetStore with the ability to read and write
-                        transaction = db.transaction(['pending'], 'readwrite');
+                    // if (res.length !== 0) {
 
-                        // Assign the current store to a variable
-                        const currentStore = transaction.objectStore('pending');
+                    transaction = db.transaction(['pending'], 'readwrite');
 
-                        // Clear existing entries because our bulk add was successful
-                        currentStore.clear();
-                        console.log('Clearing store 🧹');
-                    }
+
+                    const currentStore = transaction.objectStore('pending');
+
+
+                    currentStore.clear();
+                    console.log('Clearing store 🧹');
+                    // }
                 });
         }
     };
 }
 
 
-window.addEventListener("online", updateDatabase());
+window.addEventListener("online", updateDatabase);
