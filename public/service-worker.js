@@ -37,6 +37,7 @@ self.addEventListener("activate", function (evt) {
 
 // fetch
 self.addEventListener("fetch", function (evt) {
+    console.log("service worker fetch")
     // cache successful requests to the API
     if (evt.request.url.includes("/api/")) {
         evt.respondWith(
@@ -47,11 +48,12 @@ self.addEventListener("fetch", function (evt) {
                         if (response.status === 200) {
                             cache.put(evt.request.url, response.clone());
                         }
-
+                        console.log(response)
                         return response;
                     })
                     .catch(err => {
                         // Network request failed, try to get it from the cache.
+                        console.log(cache.match(evt.request))
                         return cache.match(evt.request);
                     });
             }).catch(err => console.log(err))
@@ -63,10 +65,13 @@ self.addEventListener("fetch", function (evt) {
     // if the request is not for the API, serve static assets using "offline-first" approach.
 
     evt.respondWith(
+
         fetch(evt.request).catch(
             () => {
+                console.log("service worker response")
                 return caches.match(evt.request).then(function (response) {
                     if (response) {
+                        console.log(response)
                         return (response)
 
                     }
@@ -75,6 +80,7 @@ self.addEventListener("fetch", function (evt) {
                     ).includes(
                         "text/html"
                     )) {
+                        console.log(caches.match("/"))
                         return (caches.match("/"))
                     }
 

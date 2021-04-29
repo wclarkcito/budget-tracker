@@ -109,7 +109,7 @@ function sendTransaction(isAdding) {
     transactions.unshift(transaction);
 
     // re-run logic to populate ui with new record
-    populateChart();
+    // populateChart();
     populateTable();
     populateTotal();
 
@@ -123,6 +123,7 @@ function sendTransaction(isAdding) {
         }
     })
         .then(response => {
+            populateChart();
             return response.json();
         })
         .then(data => {
@@ -131,6 +132,7 @@ function sendTransaction(isAdding) {
             }
             else {
                 // clear form
+
                 nameEl.value = "";
                 amountEl.value = "";
             }
